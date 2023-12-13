@@ -55,10 +55,28 @@ from cyaron import *
 # # 而不是：
 # str = String.random_sentence(5, word_separators="  ") # 这会导致从两个空格中随机选择一个，也就是只有一个空格
 
+# 生成测试数据的核心规则和要点主要包括以下几个方面：
+
+# 1. **问题理解**：理解问题的输入输出格式、约束条件和要求。这对于正确生成测试数据至关重要。
+
+# 2. **随机性和覆盖性**：在生成测试数据时，确保随机性和覆盖性。随机性保证测试数据的多样性，覆盖性则确保测试覆盖到各种可能的情况，包括边界情况和特殊情况。
+
+# 3. **边界条件**：对于输入的边界条件，例如最小值、最大值、特殊情况等，需要特别关注。确保生成的测试数据涵盖这些边界条件，这有助于验证算法或程序的健壮性。
+
+# 4. **数据合法性**：确保生成的数据符合输入约束和问题描述的要求。在生成随机数据时，需要验证生成的数据是否合法，并且不违反问题的约束条件。
+
+# 5. **多样性和复杂性**：生成多样性的测试数据，包括不同规模、不同特征的数据。这样能够更全面地测试算法或程序的性能和正确性。
+
+# 6. **自动化**：尽可能地将测试数据生成过程自动化。编写脚本或程序来生成测试数据可以提高效率，并确保数据的一致性和准确性。
+
+# 总的来说，生成测试数据需要考虑问题的要求，确保测试数据的合法性、多样性和覆盖性。随机性和边界条件的考虑能够有效地测试算法或程序的各种情况，帮助发现潜在的问题。
+
+
 # 推荐的 Cpp 代码, 文件名列表
 recommended_file_names = ["std", "test", "未命名", "未命名1", "未命名2"]
 
-# 检查是否存在可执行文件，如果不存在则尝试编译对应的源文件
+
+# 总是检查是否存在可执行文件，总是编译对应的源文件
 def compile_if_needed(file_names):
     compiled = False
     for file_name in file_names:
@@ -67,19 +85,20 @@ def compile_if_needed(file_names):
             compiled = True
             break
 
+    cpp_files = [file for file in os.listdir('.') if file.endswith('.cpp')]
+
     if not compiled:
-        cpp_files = [file for file in os.listdir('.') if file.endswith('.cpp')]
-        if len(cpp_files) > 0:
-            os_name = os.name
-            if os_name == 'nt':  # Windows
-                os.system(f"g++ {cpp_files[0]} -o std.exe")
-                print("成功编译程序为 std.exe")
-            else:  # Linux
-                os.system(f"g++ {cpp_files[0]} -o std")
-                print("成功编译程序为 std")
-        else:
+        if len(cpp_files) <= 0:
             print("错误：未找到合适的 .cpp 文件！")
             sys.exit()
+            
+    os_name = os.name
+    if os_name == 'nt':  # Windows
+        os.system(f"g++ {cpp_files[0]} -o std.exe")
+        print("成功编译程序为 std.exe")
+    else:  # Linux
+        os.system(f"g++ {cpp_files[0]} -o std")
+        print("成功编译程序为 std")
 
 
 
