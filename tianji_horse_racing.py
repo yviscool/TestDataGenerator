@@ -11,10 +11,14 @@ def generate_test_data():
             
         io.input_writeln(N)
         
-        your_horses = random.choices(list(range(1, 2 * N + 1)), k=N)  # 生成你的马匹速度列表，确保速度两两不同
-        io.input_writeln(' '.join(map(str, your_horses)))
+        horses = list(range(1, 2 * N + 1))  # 生成所有马匹的速度列表，1 到 2N
         
-        vj_horses = random.choices(list(range(1, 2 * N + 1)), k=N)  # 生成田忌的马匹速度列表，确保速度两两不同
+        random.shuffle(horses)  # 随机打乱速度列表
+        
+        your_horses = horses[:N]  # 你的马匹列表为前 N 个马匹
+        vj_horses = horses[N:]  # 田忌的马匹列表为后面的马匹
+        
+        io.input_writeln(' '.join(map(str, your_horses)))
         io.input_writeln(' '.join(map(str, vj_horses)))
         
         os_name = os.name
