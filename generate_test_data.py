@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
+import string
 from cyaron import *
 
 # cyaron 文档说明 https://github.com/luogu-dev/cyaron/wiki
@@ -55,6 +56,7 @@ from cyaron import *
 # # 而不是：
 # str = String.random_sentence(5, word_separators="  ") # 这会导致从两个空格中随机选择一个，也就是只有一个空格
 
+
 # 生成测试数据的核心规则和要点主要包括以下几个方面：
 
 # 1. **问题理解**：理解问题的输入输出格式、约束条件和要求。这对于正确生成测试数据至关重要。
@@ -71,74 +73,100 @@ from cyaron import *
 
 # 总的来说，生成测试数据需要考虑问题的要求，确保测试数据的合法性、多样性和覆盖性。随机性和边界条件的考虑能够有效地测试算法或程序的各种情况，帮助发现潜在的问题。
 
+class TestDataGenerator:
+    def __init__(self):
+        # 推荐的 Cpp 代码, 文件名列表
+        self.recommended_file_names = ["std", "test", "未命名", "未命名1", "未命名2"]
 
-# 推荐的 Cpp 代码, 文件名列表
-recommended_file_names = ["std", "test", "未命名", "未命名1", "未命名2"]
+    # 检查是否存在可执行文件，如果不存在则尝试编译对应的源文件
+    def compile_cpp_files(self):
+        # 检查是否存在可执行文件，如果不存在则尝试编译对应的源文件
+        compiled = False
+        for file_name in self.recommended_file_names:
+            # 检查当前操作系统是Windows并且文件是可执行文件，或者是Linux下的可执行文件
+            if (os.name == 'nt' and os.path.exists(f"{file_name}.exe")) or (os.name != 'nt' and os.path.exists(file_name)):
+                compiled = True
+                break
 
+        cpp_files = [file for file in os.listdir('.') if file.endswith('.cpp')]
 
-# 总是检查是否存在可执行文件，总是编译对应的源文件
-def compile_if_needed(file_names):
-    compiled = False
-    for file_name in file_names:
-        # 检查当前操作系统是Windows并且文件是可执行文件，或者是Linux下的可执行文件
-        if (os.name == 'nt' and os.path.exists(f"{file_name}.exe")) or (os.name != 'nt' and os.path.exists(file_name)):
-            compiled = True
-            break
-
-    cpp_files = [file for file in os.listdir('.') if file.endswith('.cpp')]
-
-    if not compiled:
-        if len(cpp_files) <= 0:
-            print("错误：未找到合适的 .cpp 文件！")
-            sys.exit()
+        if not compiled:
+            if len(cpp_files) <= 0:
+                print("错误：未找到合适的 .cpp 文件！")
+                sys.exit()
             
-    os_name = os.name
-    if os_name == 'nt':  # Windows
-        os.system(f"g++ {cpp_files[0]} -o std.exe")
-        print("成功编译程序为 std.exe")
-    else:  # Linux
-        os.system(f"g++ {cpp_files[0]} -o std")
-        print("成功编译程序为 std")
-
-
-# 编译并生成测试数据
-def generate_test_data():
-    
-    armstrong_numbers = [153, 370, 371, 407, 1634, 8208, 9474, 54748, 92727, 93084, 548834, 1741725, 4210818, 9800817, 9926315, 24678050, 24678051, 88593477]
-
-    for i in range(1, 11):  # 生成10组测试数据
-        io = IO(file_prefix="", data_id=i)
-
-        M = randint(1, 50)  # 随机生成1到100之间的整数，表示待判断的正整数个数
-        io.input_writeln(M)  # 写入待判断的正整数个数
-
-        armstrong_count = randint(2, len(armstrong_numbers)-1)  # 随机生成自幂数的个数，确保不超过待判断的正整数个数
-        non_armstrong_count = M - armstrong_count  # 计算非自幂数的个数
-
-        armstrong_numbers_subset = random.sample(armstrong_numbers, armstrong_count)  # 随机选取自幂数的子集
-        non_armstrong_numbers = []
-
-        while non_armstrong_count > 0:
-            n = randint(1, 10**8)  # 随机生成小于10^8的整数
-            if n not in armstrong_numbers and n not in non_armstrong_numbers:
-                non_armstrong_numbers.append(n)
-                non_armstrong_count -= 1
-
-        numbers = armstrong_numbers_subset + non_armstrong_numbers
-        random.shuffle(numbers)  # 将数字列表打乱顺序
-
-        for n in numbers:
-            io.input_writeln(n)  # 写入待判断的正整数
-
         os_name = os.name
         if os_name == 'nt':  # Windows
-            io.output_gen("std.exe")  # 调用C++可执行文件生成输出文件
-            print(f"已生成测试数据 {i}")
+            os.system(f"g++ {cpp_files[0]} -o std.exe")
+            print("成功编译程序为 std.exe")
         else:  # Linux
-            io.output_gen("./std")  # 调用C++可执行文件生成输出文件
-            print(f"已生成测试数据 {i}")
+            os.system(f"g++ {cpp_files[0]} -o std")
+            print("成功编译程序为 std")
+
+    # 删除已经存在的测试数据文件
+    def delete_existing_files(self):
+        # 删除已经存在的测试数据文件
+        in_files = [file for file in os.listdir('.') if file.endswith('.in')]
+        out_files = [file for file in os.listdir('.') if file.endswith('.out')]
+
+        files_to_delete = in_files + out_files
+        for file in files_to_delete:
+            os.remove(file)
+        print("已删除现有的输入和输出文件")
 
 
-# 生成测试数据
-generate_test_data()
+    def run(self):
+        self.compile_cpp_files()
+        self.delete_existing_files()
+        self.generate_test_data()
 
+
+
+    def generate_test_data(self):
+
+        total_cases = 5
+
+        # test_cases = [
+    #     [1, 3, 4],  # Total students: 4, arrived: 1, 3, 4
+    #     [2, 4, 5, 3],  # Total students: 5, arrived: 2, 4, 5, 3
+    #     [5, 6, 1, 2, 3],  # Total students: 6, arrived: 5, 6, 1, 2, 3
+    #     [1, 4, 2],  # Total students: 4, arrived: 1, 4, 2
+    #     [6, 3, 2, 4, 5],  # Total students: 6, arrived: 3, 2, 4, 5
+    # ]
+
+        # for i, case in enumerate(test_cases, start=1):
+        for i in range(1, total_cases + 1):
+            io = IO(file_prefix="", data_id=i)
+
+            a = randint(8, 60)
+            b = randint(3, 40)
+
+            io.input_writeln(a, b)
+
+            os_name = os.name
+            if os_name == 'nt':  # Windows
+                io.output_gen("std.exe")
+                print(f"生成测试数据 {i}")
+            else:  # Linux
+                io.output_gen("./std")
+                print(f"生成测试数据 {i}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Create an instance and execute
+data_generator = TestDataGenerator()
+data_generator.run()
